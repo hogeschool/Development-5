@@ -1,0 +1,8 @@
+C:\Users\mabba\Desktop\MVC Movie Project\bin\Debug\netcoreapp1.1\MVC Movie Project.deps.json
+C:\Users\mabba\Desktop\MVC Movie Project\bin\Debug\netcoreapp1.1\MVC Movie Project.runtimeconfig.json
+C:\Users\mabba\Desktop\MVC Movie Project\bin\Debug\netcoreapp1.1\MVC Movie Project.runtimeconfig.dev.json
+C:\Users\mabba\Desktop\MVC Movie Project\bin\Debug\netcoreapp1.1\MVC Movie Project.dll
+C:\Users\mabba\Desktop\MVC Movie Project\bin\Debug\netcoreapp1.1\MVC Movie Project.pdb
+C:\Users\mabba\Desktop\MVC Movie Project\obj\Debug\netcoreapp1.1\MVC Movie Project.AssemblyInfo.cs
+C:\Users\mabba\Desktop\MVC Movie Project\obj\Debug\netcoreapp1.1\MVC Movie Project.dll
+C:\Users\mabba\Desktop\MVC Movie Project\obj\Debug\netcoreapp1.1\MVC Movie Project.pdb
