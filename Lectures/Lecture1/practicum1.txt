@@ -1,0 +1,220 @@
+This document describes the steps you need to take in order to create a web-service project. The web-service project follows the client-server principe where the server access data from an sqlite database and provide access to this data through a REST-api. The server will be implemented using Dotnet-core and Entity framework core. The client is a Html5 application. In order to have dynamic behaviour at the client side we use React and Typescript. To bundle the build process for the client we use webpack (description missing).
+
+Lesson 1: 
+
+Source: 
+https://docs.microsoft.com/en-us/ef/core/get-started/netcore/new-db-sqlite
+Step1: Project setup
+First we need to set up a console project that will server later as the REST-api.
+
+Dotnet-core (installation and configuration)
+
+dotnet new console -o Name(think of suitable name)
+cd name
+dotnet restore (optional in dotnet-core v2)
+
+Entity framework core (DbContext and migration scripts)
+
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+in *.csproject file those lines will be added
+
+ <ItemGroup>
+   ….
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version=“2.0.0” />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version=“2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools Version=“2.0.0” /	>   
+   ….
+  </ItemGroup>
+
+ Then the entity framework core tools needs to be added manually.
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version=“2.0.0” />
+  </ItemGroup>
+
+
+
+Check if the installation was successful by executing this command in the command line: 
+dotnet ef -h (or —help)
+
+
+
+Step2: Entity framework Context and schema creation one<>many
+
+The Entity Framework enables you to query, insert, update, and delete data, using common language runtime (CLR) objects (known as entities or POCOs). The Entity Framework maps the entities and relationships that are defined in your model to a database. The Entity Framework provides facilities to do the following: materialize data returned from the database as entity objects; track changes that were made to the objects; handle concurrency; propagate object changes back to the database; and bind objects to controls.
+The primary class that is responsible for interacting with data as objects is System.Data.Entity.DbContext (often referred to as context). The context class manages the entity objects during run time, which includes populating objects with data from a database, change tracking, and persisting data to the database.
+
+The application we are building will represent the relationships between the entities movies and actors. 
+
+One <-> Many relationships
+
+public class MovieContext : DbContext
+    {
+        public DbSet<Movie> Movies { get; set; }
+        public DbSet<Actor> Actors { get; set; }
+
+
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){
+            optionsBuilder.UseSqlite("Data Source= MovieDb.db”);
+}
+
+public class Movie
+    {
+        public int MovieId { get; set; }
+        public string Title { get; set; }
+        public List<MovieActor> MovieActors { get; set; }
+    }
+
+public class Actor
+    {
+        public int ActorId { get; set; }
+        public string Name { get; set; }
+        public List<MovieActor> MovieActors { get; set; }
+    }
+ 
+The initial database creation will be done using the migration tools of the EF core.
+dotnet ef migrations add InitialCreateMovieDb
+dotnet ef database update
+
+
+Step3: Inserting data into the database
+
+A model is made up of entity classes and a derived context that represents a session with the database, allowing you to query and save data. In ordered to insert new data into the database your need to instantiate those entities and bind data to their attributes. By executing the methods Add() and SaveChanges() of the context, EF core will take care of connecting the querying the database.
+
+In the file Program.cs add those lines to the main-method. 
+
+ using (var db = new MovieContext())
+            {
+                Movie m = new Movie
+                {
+                    Title = "No country for old men",
+                    Actors = new List<Actor> {
+                                         new Actor{Name = "Tommy Lee"},
+                                         new Actor{Name = "Xavier Berdem"}
+                                }
+                };
+                db.Add(m);
+                var count = db.SaveChanges();
+}
+
+The database context tracks the instances and 
+
+
+Step4: Modifying inserted data 
+
+In order to update existing data in a table the entity framework core provides you with a find-method that accepts the unique id of a row as parameter. This raw can be saved as an instance of its mapping entity. The values are accessible through the instance attributes.  
+
+In the file Program.cs add those lines to the main-method.
+ using (var db = new MovieContext())
+{
+                Movie foundMovie = db.Movies.Find(2);
+                Console.WriteLine();
+                foundMovie.Title = "White cats, Black cats...";
+                int count = db.SaveChanges();
+                Console.WriteLine("{0} records has been changed", count);
+
+
+
+Step5: Entity framework Context and schema creation one<>many 
+
+https://docs.microsoft.com/en-us/ef/core/modeling/relationships
+
+A many to many relationship is represented by including an entity class for the join table and mapping two separate one-to-many relationships. The mapping rules are implemented in the body of a method called OnModelCreating(ModelBuilder modelBuilder) in the derived Context-class. 
+
+In the DbContext class (Model.cs)add the following method:
+
+
+
+ public class MovieContext : DbContext
+    {
+        …
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MovieActor>()
+                .HasKey(ma => new { ma.MovieId, ma.ActorId });
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(m => m.Movie)
+                .WithMany(r => r.MovieActors)
+                .HasForeignKey(m => m.MovieId);
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(a => a.Actor)
+                .WithMany(r => r.MovieActors)
+                .HasForeignKey(a => a.ActorId);
+	…
+        }
+
+    }
+
+in the command line execute these commands:
+otnet ef database drop
+dotnet ef migrations add "N-N"
+dotnet ef database update
+
+
+Step3: Inserting data into the database
+
+Refactor the code in the Program.cs for inserting the data into the database. The new insert must adapt to the changes in the database schema
+
+
+ using (var db = new MovieContext())
+            {
+                Movie m = new Movie { Title = "White cats, black cats" };
+                Actor a1 = new Actor { Name = "Acotr 1" };
+                Actor a2 = new Actor { Name = "Acotr 2" };
+
+                MovieActor ma = new MovieActor();
+                ma.Movie = m;
+                ma.Actor = a1;
+
+                MovieActor ma2 = new MovieActor();
+                ma2.Movie = m;
+                ma2.Actor = a2;
+
+                db.Add(ma);
+                db.Add(ma2);
+
+                var count = db.SaveChanges();
+                Console.WriteLine("{0} records saved to database", count);
+}
+
+
+
+
+End lesson 1
+—————
+
+
+
+Rest API (Routing principles and CRUD
+modify “Startup.cs” and add this line to the ConfigurationServices-method below services.addMvc(); 
+ 
+// services.AddDbContext<MovieContext>( 
+	options => options.UseSqlite("Data Source=Movie.db"));
+
+You could also add a default route to access the REST-APi. To do this you need to add those lines to the Configure-methode as an argument to  the app.UseMvc() method. 
+
+ app.UseMvc(
+                routes =>
+                {
+                    routes.MapRoute(
+                        name: "default",
+                        template: "{controller=Home}/{action=Index}/{id?}");
+                });
+            //added by me
+             DBinitialize.EnsureCreated(app.ApplicationServices);
+
+
+
+ 
+Client application
+NPM project (React, typescript, webpack)
+package.json
+tsconfig.json
+webpack.conifg.js
+
+
+ 
