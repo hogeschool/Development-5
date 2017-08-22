@@ -1,5 +1,5 @@
 # Introduction
-This is the repository for the course Development 1 course at Hogeschool Rotterdam.
+This is the repository for the course Development 5 course at Hogeschool Rotterdam.
 
 Please head to the [modulewijzer](modulewijzer.ipynb) in order to get basic information about the course, or head to the [lessons](Lectures) for a detailed overview of all lectures.
 
