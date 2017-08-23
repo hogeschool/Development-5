@@ -1,0 +1,10 @@
+/Users/omara/Projects/lesson1_console/bin/Debug/netcoreapp2.0/lesson1_console.deps.json
+/Users/omara/Projects/lesson1_console/bin/Debug/netcoreapp2.0/lesson1_console.runtimeconfig.json
+/Users/omara/Projects/lesson1_console/bin/Debug/netcoreapp2.0/lesson1_console.runtimeconfig.dev.json
+/Users/omara/Projects/lesson1_console/bin/Debug/netcoreapp2.0/lesson1_console.dll
+/Users/omara/Projects/lesson1_console/bin/Debug/netcoreapp2.0/lesson1_console.pdb
+/Users/omara/Projects/lesson1_console/obj/Debug/netcoreapp2.0/lesson1_console.csproj.CoreCompileInputs.cache
+/Users/omara/Projects/lesson1_console/obj/Debug/netcoreapp2.0/lesson1_console.AssemblyInfoInputs.cache
+/Users/omara/Projects/lesson1_console/obj/Debug/netcoreapp2.0/lesson1_console.AssemblyInfo.cs
+/Users/omara/Projects/lesson1_console/obj/Debug/netcoreapp2.0/lesson1_console.dll
+/Users/omara/Projects/lesson1_console/obj/Debug/netcoreapp2.0/lesson1_console.pdb
