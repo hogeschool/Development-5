@@ -1,0 +1,10 @@
+/Users/omara/Projects/lesson2_linq/bin/Debug/netcoreapp2.0/lesson2_linq.deps.json
+/Users/omara/Projects/lesson2_linq/bin/Debug/netcoreapp2.0/lesson2_linq.runtimeconfig.json
+/Users/omara/Projects/lesson2_linq/bin/Debug/netcoreapp2.0/lesson2_linq.runtimeconfig.dev.json
+/Users/omara/Projects/lesson2_linq/bin/Debug/netcoreapp2.0/lesson2_linq.dll
+/Users/omara/Projects/lesson2_linq/bin/Debug/netcoreapp2.0/lesson2_linq.pdb
+/Users/omara/Projects/lesson2_linq/obj/Debug/netcoreapp2.0/lesson2_linq.csproj.CoreCompileInputs.cache
+/Users/omara/Projects/lesson2_linq/obj/Debug/netcoreapp2.0/lesson2_linq.AssemblyInfoInputs.cache
+/Users/omara/Projects/lesson2_linq/obj/Debug/netcoreapp2.0/lesson2_linq.AssemblyInfo.cs
+/Users/omara/Projects/lesson2_linq/obj/Debug/netcoreapp2.0/lesson2_linq.dll
+/Users/omara/Projects/lesson2_linq/obj/Debug/netcoreapp2.0/lesson2_linq.pdb
