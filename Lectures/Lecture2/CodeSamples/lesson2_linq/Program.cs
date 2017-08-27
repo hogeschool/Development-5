@@ -26,8 +26,6 @@ namespace lesson2_linq {
             // InsertMovies();
 
             // Projection();
-            // ProjectionWithFiltering();
-            // ProjectionWithOrdering();
             // Join ();
             SubqueryAndAggregation();
 
@@ -37,8 +35,30 @@ namespace lesson2_linq {
 
             // SELECT id,title,release FROM movies AS m;           
             using (var db = new MovieContext ()) {
-                IQueryable<Movie> source = db.Movies;
-                IQueryable<Movie> results = (from m in source select m);
+                IQueryable<Movie> source1 = db.Movies;
+                IQueryable<Actor> source2 = db.Actors;
+
+
+                // Projection 
+                IQueryable<Movie> results = from m in source1 
+                                            select m;
+
+                
+                /** 
+                 * Projection with filtering
+                 * SELECT id,title,release FROM movies AS m WHERE m.release > 2000;  
+                */
+
+                // IQueryable<Movie> results = (from m in source1 where m.Release > new DateTime (2000, 1, 1) select m);
+
+
+                /**
+                 *  Projection with ordering
+                 * SELECT id,title,release FROM movies AS m WHERE release > 01-01-2000 ORDER BY m.release DESC;  
+                **/
+
+                // IQueryable<Movie> results = (from m in source1 where m.Release > new DateTime (2000, 1, 1) orderby m.Release descending select m);
+
 
                 Console.WriteLine ("Movie title | Release");
                 foreach (var movie in results) {
@@ -53,44 +73,18 @@ namespace lesson2_linq {
             }
         }
 
-        static void ProjectionWithFiltering () {
 
-            // SELECT id,title,release FROM movies AS m WHERE m.release > 2000;           
-            using (var db = new MovieContext ()) {
-
-                IQueryable<Movie> source = db.Movies;
-                IQueryable<Movie> results = (from m in source where m.Release > new DateTime (2000, 1, 1) select m);
-
-                Console.WriteLine ("Movie title | Release");
-                foreach (var movie in results) {
-
-                    Console.WriteLine ("- {0} | {1}", movie.Title, movie.Release);
-                }
-
-            }
-
-        }
-
-        // SELECT id,title,release FROM movies AS m WHERE release > 01-01-2000 ORDER BY m.release DESC;  
-
-        static void ProjectionWithOrdering () {
-
-            using (var db = new MovieContext ()) {
-                IQueryable<Movie> source = db.Movies;
-                IQueryable<Movie> results = (from m in source where m.Release > new DateTime (2000, 1, 1) orderby m.Release descending select m);
-
-                Console.WriteLine ("Movie title | Release");
-                foreach (var movie in results) {
-                    Console.WriteLine ("- {0} | {1}", movie.Title, movie.Release);
-                }
-            }
-        }
+       
 
         static void Join () {
-
             using (var db = new MovieContext ()) {
                 IQueryable<Movie> source1 = db.Movies;
                 IQueryable<Actor> source2 = db.Actors;
+
+                /**
+                 * No natural join support
+                 * 
+                 */
 
                 // var query = source1.AsQueryable().Join(source2,
                 //     movie => movie.MovieId,
@@ -98,22 +92,35 @@ namespace lesson2_linq {
                 //     (movie, actor) =>
                 //         new { Title = movie.Title, ActorName = actor.Name });
 
-                // Explicit JOIN
-                // var Implicit = from movie in source1
+
+                /**
+                 *  Explicit JOIN
+                 *  SELECT movies.Title, actors.Name from movies INNER JOIN actors ON movies.movieId == actors.movieId 
+                 */
+
+                // var Explicit = from movie in source1
                 //              join actor in source2 on movie.MovieId equals actor.MovieId 
                 //              select new {
                 //                   Title = movie.Title, ActorName = actor.Name 
                 //              };
 
-                // Implicit JOIN
-                var Explicit = from movie in source1
-                from actor in source2
-                where movie.MovieId == actor.MovieId
-                select new {
-                    Title = movie.Title, ActorName = actor.Name
-                };
+                 /**
+                 *  Implicit JOIN
+                 *  SELECT movies.Title, actors.Name FROM movies, actors WHERE movies.movieId == actors.movieId 
+                 */
+                
+                var Implicit = from movie in source1
+                                from actor in source2
+                                where movie.MovieId == actor.MovieId
+                                select new {
+                                    Title = movie.Title, ActorName = actor.Name
+                                };
 
-                //LEFT OUTER JOIN
+                 /**
+                 *  Implicit JOIN
+                 *  SELECT movies.Title, actors.Name FROM movies LEFT OUTER JOIN actors ON movies.movieId == actors.movieId 
+                 */
+
                 // var Outer = from movie in source1
                 //             join actor in source2 on movie.MovieId equals actor.MovieId into MovieActor
                 //             from sub in MovieActor.DefaultIfEmpty()
@@ -123,7 +130,7 @@ namespace lesson2_linq {
                 //                     };
 
                 Console.WriteLine ("Movie title | Actor name");
-                foreach (var movie in Explicit) {
+                foreach (var movie in Implicit) {
                     Console.WriteLine ("- {0} | {1} ", movie.Title, movie.ActorName);
                 }
             }
@@ -135,6 +142,13 @@ namespace lesson2_linq {
                 IQueryable<Movie> source1 = db.Movies;
                 IQueryable<Actor> source2 = db.Actors;
 
+
+                /**
+                 *  Subquery
+                 *  
+                */
+
+                // TODO: Improve this example 
                 var Subquery = from movie in source1
                                 join actor in source2 on movie.MovieId equals actor.MovieId into MovieActor
                                 select new {
