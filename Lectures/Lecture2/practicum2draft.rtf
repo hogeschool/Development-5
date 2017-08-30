@@ -1,0 +1,540 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fmodern\fcharset0 Courier;\f2\fnil\fcharset0 LucidaGrande;
+\f3\fnil\fcharset0 Menlo-Regular;\f4\fnil\fcharset0 Tahoma;}
+{\colortbl;\red255\green255\blue255;\red14\green115\blue192;\red0\green0\blue109;\red31\green31\blue31;
+\red255\green255\blue255;\red229\green168\blue255;\red1\green25\blue64;\red255\green236\blue157;\red174\green208\blue255;
+\red253\green136\blue147;\red200\green241\blue153;\red139\green255\blue255;\red0\green0\blue0;\red63\green64\blue64;
+\red95\green112\blue168;\red254\green185\blue125;\red229\green168\blue255;\red1\green25\blue64;\red255\green255\blue255;
+\red253\green136\blue147;\red174\green208\blue255;\red254\green185\blue125;\red11\green92\blue185;\red255\green236\blue157;
+\red200\green241\blue153;\red95\green112\blue168;}
+{\*\expandedcolortbl;;\cssrgb\c0\c53333\c80000;\cssrgb\c0\c0\c50196;\cssrgb\c16471\c16471\c16471;
+\cssrgb\c100000\c100000\c100000;\cssrgb\c92157\c73333\c100000;\cssrgb\c0\c14118\c31765;\cssrgb\c100000\c93333\c67843;\cssrgb\c73333\c85490\c100000;
+\cssrgb\c100000\c61569\c64314;\cssrgb\c81961\c94510\c66275;\cssrgb\c60000\c100000\c100000;\cssrgb\c0\c0\c0;\cssrgb\c31373\c31765\c31765;
+\cssrgb\c44706\c52157\c71765;\cssrgb\c100000\c77255\c56078;\cssrgb\c92157\c73333\c100000;\cssrgb\c0\c14118\c31765;\cssrgb\c100000\c100000\c100000;
+\cssrgb\c100000\c61569\c64314;\cssrgb\c73333\c85490\c100000;\cssrgb\c100000\c77255\c56078;\cssrgb\c0\c44706\c77647;\cssrgb\c100000\c93333\c67843;
+\cssrgb\c81961\c94510\c66275;\cssrgb\c44706\c52157\c71765;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28460\viewh15460\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs52 \cf0 \expnd0\expndtw0\kerning0
+Activities\cf2 \'b6\cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0\fs28 \cf3 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf0 After developing a structure for your data in the database you will learn how to access this data through the models you have created in previous session.  Using an ORM-tool such as EF core
+\f2 \cf4  during implementing can 
+\f0 reduce the complexity of accessing and integrating information.
+\f2\fs26  Although
+\f0\fs28 \cf0  ORM-tools reduces the complexity, performing a query in your application needs to be done carefully to avoid side effect in your application. In the previous practicum we started to model a movie database. In the model of this example a Movie entity has a one-to-many relationship with an Actor entity. \
+When implementing queries in the following steps we will first mention the SQL query then the LINQ equivalent version. LINQ is declarative, in declarative programming style  
+\f2\fs26 \cf4 you express the logic of programs without specifying the execution details. 
+\f0\fs28 \cf0  That means that LINQ will map its query during compilation-time to a SQL query after it applies some optimisation steps. \
+\
+The implemented queries in this document cover those relational database concepts, but it is not limited to those concepts only:\
+\
+- Projection \
+- Filtering          \
+- Ordering       \
+- Grouping                 \
+- Joining\
+- Subquery             \
+- Aggregation (Count, Min, Max, Sum, Average)
+\f3\fs24 \cf5 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs52 \cf0 \
+Step 0: Project setup\
+\pard\pardeftab720\partightenfactor0
+
+\b0\fs28 \cf0 - Follow the steps in practicum 1 until you reach the end of the creation of one-to-many relationship.\
+\
+Step 1: Model creation\
+- Extend the models that has been implemented in practicum 1 to capture more data about the business domain. This step is necessary to write more advanced queries. Modify the the Movie and the Actor entities in the file Model.cs in your toot directory.  Your C# code should look like the following.\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 using\cf5  \cf8 System\cf5 ;\cb1 \
+\cf6 \cb7 using\cf5  \cf8 System\cf5 .\cf8 Collections\cf5 .\cf8 Generic\cf5 ;\cb1 \
+\cf6 \cb7 using\cf5  \cf8 Microsoft\cf5 .\cf8 EntityFrameworkCore\cf5 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf0 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf5 \cb7  \cf6 class\cf5  \cf8 MovieContext\cf5  : \cf6 DbContext\cf5  \{\cb1 \
+\cb7         \cf6 public\cf5  \cf6 DbSet\cf5 <\cf6 Movie\cf5 > Movies \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\cb7         \cf6 public\cf5  \cf6 DbSet\cf5 <\cf6 Actor\cf5 > Actors \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\
+\cb7         \cf6 protected\cf5  \cf6 override\cf5  \cf6 void\cf5  \cf9 OnConfiguring\cf5  (\cf6 DbContextOptionsBuilder\cf5  optionsBuilder) \{\cb1 \
+\cb7             \cf10 optionsBuilder\cf5 .\cf9 UseSqlite\cf5  (\cf11 "Data Source=Movie.db"\cf5 );\cb1 \
+\cb7                    \}\cb1 \
+\
+\cb7         \cf6 protected\cf5  \cf6 override\cf5  \cf6 void\cf5  \cf9 OnModelCreating\cf5  (\cf6 ModelBuilder\cf5  modelBuilder) \{\cb1 \
+\cb7             \cf10 modelBuilder\cf5 .\cf9 Entity\cf5 <\cf6 Actor\cf5 > ()\cb1 \
+\cb7                 .\cf9 HasOne\cf5 (m \cf12 =>\cf5  \cf10 m\cf5 .\cf10 Movie\cf5 )\cb1 \
+\cb7                 .\cf9 WithMany\cf5  (a \cf12 =>\cf5  \cf10 a\cf5 .\cf10 Actors\cf5 )\cb1 \
+\cb7                 .\cf9 HasForeignKey\cf5  (m \cf12 =>\cf5  \cf10 m\cf5 .\cf10 MovieId\cf5 );\cb1 \
+\cb7         \}\cb1 \
+\cb7     \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf0 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 public\cf5  \cf6 class\cf5  \cf8 Movie\cf5  \{\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 int\cf5  Id \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 string\cf5  Title \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 DateTime\cf5  Release \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 List\cf5 <\cf6 Actor\cf5 > Actors \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\cb7     \}\cb1 \
+\
+\cf6 \cb7 public\cf5  \cf6 class\cf5  \cf8 Actor\cf5  \{\cb1 \
+\cb7         \cf6 public\cf5  \cf6 int\cf5  Id \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 string\cf5  Name \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 DateTime\cf5  Birth \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 string\cf5  Gender \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 int\cf5  MovieId \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7         \cf6 public\cf5  \cf6 Movie\cf5  Movie \{ \cf6 get\cf5 ; \cf6 set\cf5 ; \}\cb1 \
+\
+\cb7     \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf0 \
+- You can add more attributes as long as you are using them correctly in your queries. \
+\
+- In the command line run the following command to update the schema of your database\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \cb5 dotnet ef database update
+\f0 \cb1  \
+\
+Step 2: LINQ integration and program setup\
+\
+- In Addition to the .Net Core and Entity Framework (EF) we are going to use 
+\fs24 .NET Language-Integrated Query (
+\fs28 LINQ) to implement the queries. In LINQ 
+\f2\fs26 \cf4 query expressions use the of the rich metadata, compile-time syntax checking, static typing of the the programming language. this expressions will be optimised and compiled once to SQL to be excused later on in the database. There are two different kind of queries:\
+	- Sequence queries that returns a new 
+\f4\fs32 \cf14 \cb5 IQueryable<T>
+\f2\fs26 \cf4 \cb1  \
+	- Value queries that return a single value\
+ \
+- Modify the Program.cs file to include LINQ. In this document all the implementation will be done in the Program.cs file. In order to avoid the repetition of some code in this document we will implement all the queries in the main method using one database context instance. \
+\
+- Its strongly advised to have a different structure in your application. For example you could group some queries logically in different static methods as show in the following code to ease testing:    
+\f1 \cf0 \
+\'85\
+using System.Linq;
+\f2 \cf4     \
+\'85
+\f3\fs24 \cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf5 \cb7  \cf6 class\cf5  \cf8 Program\cf5 \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7  	static\cf5  \cf6 void\cf5  \cf9 Main\cf5 (\cf6 string\cf5 [] args)\
+	\{\cb1 \
+\cb7 		\'85\
+            // DataInsertion();\cb1 \
+\cb7             \cf15 // Projection();\cf5 \cb1 \
+\cb7             \cf15 // Join ();\cf5 \cb1 \
+\cb7             \cf15 // SubqueryAndAggregation();\
+		\'85\cf5 \cb1 \
+\cb7 	\}\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f2\fs26 \cf4 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf5 \cb7  	\cf6 static\cf5  \cf6 void\cf5  \cf9 DataInsertion\cf5 ()\{\cf15            \cf5 \cb1 \
+		\cf6 \cb7 using\cf5  (\cf6 var\cf5  db \cf12 =\cf5  \cf6 new\cf5  \cf6 MovieContext\cf5 ())\cb1 \
+\cb7           \{\cb1 \
+\cb7                 \'85.\
+\cf6 		\}\
+\}\cf5 \cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf0 - Remeber the usage of 
+\f1 \cb5 using
+\f0 \cb1 . Here 
+\f1 \cb5 using
+\f0 \cb1  will take care of closing the connection with the database once its body is executed.\
+
+\f2\fs26 \cf4 \
+Step 3: Data insertion\
+-  As we done in previous session we will insert some data into the database in order to access them. Add more than one movie and vary the number of actors for each to get better results. 
+\f0\fs28 \cf0  Remember to make your changes persistent in the database you need to call first the method SaveChanges() in context. \
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 \'85\
+using\cf5  (\cf6 var\cf5  db \cf12 =\cf5  \cf6 new\cf5  \cf6 MovieContext\cf5 ())\{\cb1 \
+\cb7       \cf6 int\cf5  movie_id \cf12 =\cf5  \cf10 db\cf5 .\cf10 Movies\cf5 .\cf9 DefaultIfEmpty\cf5 ().\cf9 Max\cf5 (movie \cf12 =>\cf5  \cf10 movie\cf5 .\cf10 MovieId\cf5 ) \cf12 +\cf5  \cf16 1\cf5 ;\cb1 \
+\cb7       \cf6 Movie\cf5  m \cf12 =\cf5  \cf6 new\cf5  \cf6 Movie\cf5 \{\cb1 \
+\cb7             \cf10 MovieId\cf5  \cf12 =\cf5  \cf10 movie_id\cf5 ,\cb1 \
+\cb7             \cf10 Title\cf5  \cf12 =\cf5  \cf11 "Divorce Italian Style"\cf5 ,\cb1 \
+\cb7             \cf10 Actors\cf5  \cf12 =\cf5  \cf6 new\cf5  \cf6 System\cf5 .\cf6 Collections\cf5 .\cf6 Generic\cf5 .\cf6 List\cf5 <\cf6 Actor\cf5 > \{\cb1 \
+\cb7                          \cf6 new\cf5  \cf6 Actor\cf5 \{ \cf10 Name\cf5  \cf12 =\cf5  \cf11 "Marcello Mastroianni"\cf5 ,\cb1 \
+\cb7                                     \cf10 Birth\cf5  \cf12 =\cf5  \cf10 DateTime\cf5 .\cf10 Now\cf5  , \cb1 \
+\cb7                                     \cf10 Gender\cf12 =\cf5   \cf11 "Male"\cf5 ,\cb1 \
+\cb7                                     \cf10 MovieId\cf5  \cf12 =\cf5  \cf10 movie_id\cf5 \},\cb1 \
+\cb7                                 \cf6 new\cf5  \cf6 Actor\cf5 \{ \cf10 Name\cf5  \cf12 =\cf5  \cf11 "Daniela Rocca"\cf5 ,\cb1 \
+\cb7                                     \cf10 Birth\cf5  \cf12 =\cf5  \cf10 DateTime\cf5 .\cf10 Now\cf5  , \cb1 \
+\cb7                                     \cf10 Gender\cf12 =\cf5   \cf11 "Female"\cf5 ,\cb1 \
+\cb7                                     \cf10 MovieId\cf5  \cf12 =\cf5  \cf10 movie_id\cf5 \}\cb1 \
+\cb7                      \}\cb1 \
+\cb7             \};\
+\
+//Add more movies here\
+\
+//\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf10 \cb7 db\cf5 .\cf9 Add\cf5 (\cf10 m\cf5 );\cb1 \
+\cf10 \cb7 db\cf5 .\cf9 SaveChanges\cf5 ();\
+\'85\
+\}
+\f2\fs26 \cf4 \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \
+- In the command line execute the run command to save this data\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs28 \cf0 \cb5 dotnet run\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \cb1 - After inserting data into the database. There is no need to execute this code any more. You can uncomment the instantiation and insertion code in the main method. As mentioned earlier we are going to keep using the database context instance to preform the coming queries.  \
+\
+Step 4: Projection\
+\
+- In projection we define a set of attributes which values need to be obtained in the result. For instance we could only select specific attributes such as \{title, release\} of the entity movie. As a result we will get only the values of this set of attributes from the database. In case you do not specify you will get the values of all attributes of that entity.  Assume the you have inserted a view movies in the database. In LINQ the projection is applied in in the SELECT part of the query.  \
+\
+- SQL (projection) \
+\
+SELECT * FROM movies\
+\
+- LINQ\
+\
+We will query in this example only the movie database. 
+\f3\fs24 \cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf6 \cb7 \'85\
+IQueryable\cf5 <\cf6 Movie\cf5 > source1 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Movies\cf5 ;\
+\cb1 \
+\cf6 \cb7 var\cf5  results \cf12 =\cf5  \cf6 from\cf5  m \cf6 in\cf5  \cf10 source1\cf5  \cf6 select\cf5  \cf10 m\cf5 ;\
+\'85\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 - SQL (specified projection)\
+SELECT title, release from movie\
+
+\f3\fs24 \cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf6 \cb7 IQueryable\cf5 <\cf6 Movie\cf5 > result \cf12 =\cf5  \cf6 from\cf5  m \cf6 in\cf5  \cf10 source1\cf5  \cb1 \
+\cb7                                 \cf6 select\cf5  \cf6 new\cf5 \{\cb1 \
+\cb7                                         \cf10 Title\cf5  \cf12 =\cf5  \cf10 m\cf5 .\cf10 Title\cf5 ,\cb1 \
+\cb7                                         \cf10 Release\cf5  \cf12 =\cf5  \cf10 m\cf5 .\cf10 Release\cf5 \cb1 \
+\cb7                                         \};\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+
+\f0\fs28 \cf0 - If you want to see the title and the release date of movies you can run in your main method the following code. 
+\f2\fs26 \cf4 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf10 \cb7 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "Movie title | Release"\cf5 );\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf5 \cb7    \cf6 foreach\cf5  (\cf6 var\cf5  movie \cf6 in\cf5  \cf10 result\cf5 )\{\cb1 \
+\cb7         \cf10 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "- \{0\} | \{1\} "\cf5 , \cf10 movie\cf5 .\cf10 Title\cf5 , \cf10 movie\cf5 .\cf10 Release\cf5 );\cb1 \
+\cb7     \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\
+\
+\
+Step 5: Projection and filtering\
+- When implementing projection you can further restrict the values in the result by defining one or more condition. You can define multiple condition by using logical operators such as AND or OR\
+- In this step we perform a query that only include movies which are released after the date 01-01-2000. \
+\
+- SQL \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf15 \cb7 SELECT title,release FROM movies AS m \
+		WHERE m.release > 2000;  \cf5 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\
+- LINQ\
+
+\f3\fs24 \cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf6 \cb7 IQueryable\cf5 <\cf6 Movie\cf5 > source1 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Movies\cf5 ;\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf15 \cb7 IQueryable<Movie> results = from m in source1 \
+							where m.Release > new DateTime (2000, 1, 1) \
+							select \cf6 m\cf5 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\
+Step 6: Projection with ordering\
+\
+- You can also order the result based on the values of a specific column or by specifying many columns in a given order. The ordering can be descending or ascending. \
+- In following query the return values of the result are movies released after 01-01-2000 and ordered descendly by their release date. \
+\
+- SQL\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf15 \cb7 SELECT * FROM movies AS m \
+	WHERE release > 01-01-2000 \
+		ORDER BY m.release DESC; \cf5 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+- LINQ\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf15 \cb7 IQueryable<Movie> results = from m in source1 \
+							where m.Release > new DateTime (2000, 1, 1) \
+							orderby m.Release descending select m;\cf5 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+Step 7: Grouping and aggregation\
+\
+- In some cases the results values need to be ordered into groups. In combination with aggregation functions you can do additional operations such as counting values of this groups. \
+- In the following query we group actors by genders and then counting the number of actors in our database for each gender \
+\
+-SQL\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf15 \cb7 SELECT count(a.actorid),a.gender FROM actors AS a \
+	GROUP BY a.gender; 
+\f2\fs26 \cf4 \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \
+-LINQ\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 IQueryable\cf5 <\cf6 Actor\cf5 > source2 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Actors\cf5 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf5 \cb7  \cf6 var\cf5  result \cf12 =\cf5  \cf6 from\cf5  a \cf6 in\cf5  \cf10 source2\cf5 \cb1 \
+\cb7                      \cf6 group\cf5  \cf10 a\cf5  \cf6 by\cf5  \cf10 a\cf5 .\cf10 Gender\cf5  \cf6 into\cf5  genderGroup\cb1 \
+\cb7                      \cf6 select\cf5  \cf6 new\cf5  \{\cb1 \
+\cb7                            \cf10 Key\cf5  \cf12 =\cf5  \cf10 genderGroup\cf5 .\cf10 Key\cf5 ,\cb1 \
+\cb7                            \cf10 GenderCount\cf5  \cf12 =\cf5  \cf10 genderGroup\cf5 .\cf9 Count\cf5 ()\cb1 \
+\cb7                            \};\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+- Since we changes the names of attributes in the result, you need to adapt your code to output the data correctly\
+ \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf5 \cb7  \cf10 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "Gender | Number of actors"\cf5 );\cb1 \
+\cb7  \cf6 foreach\cf5  (\cf6 var\cf5  actor \cf6 in\cf5  \cf10 result\cf5 )\{\cb1 \
+\cb7         \cf10 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 " \{0\} | \{1\} "\cf5 ,\cf10 actor\cf5 .\cf10 Key\cf5 , \cf10 actor\cf5 .\cf10 GenderCount\cf5 );\cb1 \
+\cb7 \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\
+Step 8: Joining\
+- When applying join you combines attributes of one or more entities in the result and present the values as one single result. \
+\
+- SQL\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf15 \cb7 SELECT movies.Title, actors.Name FROM movies, actors \
+		WHERE movies.movieId == actors.movieId \cf5 \cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+- LINQ\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 IQueryable\cf5 <\cf6 Movie\cf5 > source1 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Movies\cf5 ;\cb1 \
+\cf6 \cb7 IQueryable\cf5 <\cf6 Actor\cf5 > source2 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Actors\cf5 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 var\cf5  Implicit \cf12 =\cf5  \cf6 from\cf5  movie \cf6 in\cf5  \cf10 source1\cf5 \cb1 \
+\cb7           \cf6 from\cf5  actor \cf6 in\cf5  \cf10 source2\cf5 \cb1 \
+\cb7           \cf6 where\cf5  \cf10 movie\cf5 .\cf10 MovieId\cf5  \cf12 ==\cf5  \cf10 actor\cf5 .\cf10 MovieId\cf5 \cb1 \
+\cb7           \cf6 select\cf5  \cf6 new\cf5 \{\cb1 \
+\cb7                    \cf10 Title\cf5  \cf12 =\cf5  \cf10 movie\cf5 .\cf10 Title\cf5 ,\cb1 \
+\cb7                    \cf10 ActorName\cf5  \cf12 =\cf5  \cf10 actor\cf5 .\cf10 Name\cf5 \cb1 \
+\cb7                    \};\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+- To output the result in the console we adapt the attribute names to the query result.\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf10 \cb7 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "Movie title | Actor name"\cf5 );\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf6 \cb7 foreach\cf5  (\cf6 var\cf5  movie \cf6 in\cf5  \cf10 Implicit\cf5 )\cb1 \
+\cb7                 \{\cb1 \
+\cb7                     \cf10 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "- \{0\} | \{1\} "\cf5 , \cf10 movie\cf5 .\cf10 Title\cf5 , \cf10 movie\cf5 .\cf10 ActorName\cf5 );\cb1 \
+\cb7                 \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \
+- Then execute the dotnet run command in console again.\
+\
+- Result\
+\
+Step 9: Subquery and aggregation\
+\
+- A subquery is useful when you need intermediate result before executing the rest of the query. In LINQ you can implement a subquery by using the keyword let. In the following query we implement tow queries. The first query which will access the data of movies depends on the result of the subquery. The subquery itself access the actor data. \
+\
+- SQL\
+\
+SELECT * FROM (\
+		SELECT count(a.actorid) AS actorsNr ,m.title FROM actors AS a,movies As m \
+			WHERE a.movieid = m.movieid \
+			GROUP BY m.title \
+		) AS q \
+		WHERE q.actorsNr < 3;\
+\
+- LINQ\
+\'85\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf6 \cb7 IQueryable\cf5 <\cf6 Movie\cf5 > source1 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Movies\cf5 ;\cb1 \
+\cf6 \cb7 IQueryable\cf5 <\cf6 Actor\cf5 > source2 \cf12 =\cf5  \cf10 db\cf5 .\cf10 Actors\cf5 ;\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+\cf17 \cb18 \outl0\strokewidth0 \strokec17 var\cf19 \strokec19  Query \cf12 \strokec12 =\cf19 \strokec19  \cb1 \
+\cb18           (\cf17 \strokec17 from\cf19 \strokec19  movie \cf17 \strokec17 in\cf19 \strokec19  \cf20 \strokec20 source1\cf19 \cb1 \strokec19 \
+\cb18              \cf17 \strokec17 let\cf19 \strokec19  actors_of_movie \cf12 \strokec12 =\cf19 \strokec19  (\cb1 \
+\cb18                 \cf17 \strokec17 from\cf19 \strokec19  actor \cf17 \strokec17 in\cf19 \strokec19  \cf20 \strokec20 source2\cf19 \cb1 \strokec19 \
+\cb18                    \cf17 \strokec17 where\cf19 \strokec19  \cf20 \strokec20 actor\cf19 \strokec19 .\cf20 \strokec20 MovieId\cf19 \strokec19  \cf12 \strokec12 ==\cf19 \strokec19  \cf20 \strokec20 movie\cf19 \strokec19 .\cf20 \strokec20 MovieId\cf19 \cb1 \strokec19 \
+\cb18                    \cf17 \strokec17 select\cf19 \strokec19  \cf20 \strokec20 actor\cf19 \strokec19 )\cb1 \
+\cb18               \cf17 \strokec17 where\cf19 \strokec19  \cf20 \strokec20 movie\cf19 \strokec19 .\cf20 \strokec20 Actors\cf19 \strokec19 .\cf21 \strokec21 Count\cf19 \strokec19 () \cf12 \strokec12 <\cf19 \strokec19  \cf22 \strokec22 3\cf19 \strokec19     \cb1 \
+\cb18               \cf17 \strokec17 select\cf19 \strokec19  \cf17 \strokec17 new\cf19 \strokec19  \{\cb1 \
+\cb18                     \cf20 \strokec20 Title\cf19 \strokec19  \cf12 \strokec12 =\cf19 \strokec19  \cf20 \strokec20 movie\cf19 \strokec19 .\cf20 \strokec20 Title\cf19 \strokec19 ,\cb1 \
+\cb18                     \cf20 \strokec20 AcotrsNr\cf19 \strokec19  \cf12 \strokec12 =\cf19 \strokec19  \cf20 \strokec20 movie\cf19 \strokec19 .\cf20 \strokec20 Actors\cf19 \strokec19 .\cf21 \strokec21 Count\cf19 \strokec19 ()\cb1 \
+\cb18                 \});\cb1 \
+\
+\pard\pardeftab720\sl360\partightenfactor0
+\cf5 \outl0\strokewidth0 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 - To output the result in the console we adapt the attribute names to the query result.
+\f3\fs24 \cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf5 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf10 \cb7 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "Movie title | Actors-Nr"\cf5 );\cb1 \
+\pard\pardeftab720\sl360\partightenfactor0
+\cf6 \cb7 foreach\cf5  (\cf6 var\cf5  movie \cf6 in\cf5  \cf10 Query\cf5 )\{\cb1 \
+\cb7         \cf10 Console\cf5 .\cf9 WriteLine\cf5 (\cf11 "\{0\} | \{1\} "\cf5 , \cf10 movie\cf5 .\cf10 Title\cf5 , \cf10 movie\cf5 .\cf10 ActorsNr\cf5 );\cb1 \
+\cb7 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 - Then execute the dotnet run command in console again.\
+\
+\
+Step 10: Lazy loading \
+\
+- \cf4 Lazy loading is the process whereby an entity or collection of entities is automatically loaded from the database the first time that an attributes referring to the entity/entities is accessed. For example, when using the movie entity class defined above, the related actors will be loaded the first time the actors navigation property is accessed. By default LINQ queries use lazy loading to avoid unnecessary resource usage. \
+\
+- In LINQ you have a method that forces immediate query evaluation and returns a {\field{\*\fldinst{HYPERLINK "https://msdn.microsoft.com/en-us/library/6sh2ey19(v=vs.110).aspx"}}{\fldrslt \cf23 List<T>}} that contains the query results. You can append this method to your query in order to obtain a cached copy of the query results. You can do additional processing of the the data through applying list operations.\
+\
+- Explicit loading can be used when you are interested in loading the data in memory to process instead of  \
+\
+-in short try to query at most once the database per problem without nested toList().\cf4 \
+\
+Step 11: Logging\
+\
+- To understand the process of translating LINQ queries into SQL and to understand if the atomic behaviour of the queries is maintained.  This is done by implementing a decorator that logs the queries to a file\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf17 \cb18 \outl0\strokewidth0 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 class\cf19 \strokec19  \cf24 \strokec24 MyLoggerProvider\cf19 \strokec19  : \cf17 \strokec17 ILoggerProvider\cf19 \cb1 \strokec19 \
+\cb18     \{\cb1 \
+\cb18         \cf17 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 ILogger\cf19 \strokec19  \cf21 \strokec21 CreateLogger\cf19 \strokec19 (\cf17 \strokec17 string\cf19 \strokec19  categoryName)\cb1 \
+\cb18         \{\cb1 \
+\cb18             \cf17 \strokec17 return\cf19 \strokec19  \cf17 \strokec17 new\cf19 \strokec19  \cf17 \strokec17 MyLogger\cf19 \strokec19 ();\cb1 \
+\cb18         \}\cb1 \
+\
+\cb18         \cf17 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 void\cf19 \strokec19  \cf21 \strokec21 Dispose\cf19 \strokec19 ()\cb1 \
+\cb18         \{ \}\cb1 \
+\
+\cb18         \cf17 \strokec17 private\cf19 \strokec19  \cf17 \strokec17 class\cf19 \strokec19  \cf24 \strokec24 MyLogger\cf19 \strokec19  : \cf17 \strokec17 ILogger\cf19 \cb1 \strokec19 \
+\cb18         \{\cb1 \
+\cb18             \cf17 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 bool\cf19 \strokec19  \cf21 \strokec21 IsEnabled\cf19 \strokec19 (\cf17 \strokec17 LogLevel\cf19 \strokec19  logLevel)\cb1 \
+\cb18             \{\cb1 \
+\cb18                 \cf17 \strokec17 return\cf19 \strokec19  \cf22 \strokec22 true\cf19 \strokec19 ;\cb1 \
+\cb18             \}\cb1 \
+\
+\cb18             \cf17 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 void\cf19 \strokec19  \cf21 \strokec21 Log\cf19 \strokec19 <\cf24 \strokec24 TState\cf19 \strokec19 >(\cf17 \strokec17 LogLevel\cf19 \strokec19  logLevel, \cf17 \strokec17 EventId\cf19 \strokec19  eventId, \cf17 \strokec17 TState\cf19 \strokec19  state, \cf17 \strokec17 Exception\cf19 \strokec19  exception, \cf17 \strokec17 Func\cf19 \strokec19 <\cf17 \strokec17 TState\cf19 \strokec19 , \cf17 \strokec17 Exception\cf19 \strokec19 , \cf17 \strokec17 string\cf19 \strokec19 > formatter)\cb1 \
+\cb18             \{\
+			\cb1 \
+\cb18                 \cf20 \strokec20 File\cf19 \strokec19 .\cf21 \strokec21 AppendAllText\cf19 \strokec19 (\cf25 \strokec25 @"C:\\temp\\log.txt"\cf19 \strokec19 , \cf21 \strokec21 formatter\cf19 \strokec19 (\cf20 \strokec20 state\cf19 \strokec19 , \cf20 \strokec20 exception\cf19 \strokec19 ));\cb1 \
+\cb18                 \cf20 \strokec20 Console\cf19 \strokec19 .\cf21 \strokec21 WriteLine\cf19 \strokec19 (\cf21 \strokec21 formatter\cf19 \strokec19 (\cf20 \strokec20 state\cf19 \strokec19 , \cf20 \strokec20 exception\cf19 \strokec19 ));\cb1 \
+\cb18             \}\cb1 \
+\
+\cb18             \cf17 \strokec17 public\cf19 \strokec19  \cf17 \strokec17 IDisposable\cf19 \strokec19  \cf21 \strokec21 BeginScope\cf19 \strokec19 <\cf24 \strokec24 TState\cf19 \strokec19 >(\cf17 \strokec17 TState\cf19 \strokec19  state)\cb1 \
+\cb18             \{\cb1 \
+\cb18                 \cf17 \strokec17 return\cf19 \strokec19  \cf22 \strokec22 null\cf19 \strokec19 ;\cb1 \
+\cb18             \}\cb1 \
+\cb18         \} \cb1 \
+\cb18     \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \outl0\strokewidth0 \
+\
+- To use this decorator in your project you need to connect it to the adopted database in the file Model.cs\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f3\fs24 \cf17 \cb18 \outl0\strokewidth0 \strokec17 protected\cf19 \strokec19  \cf17 \strokec17 override\cf19 \strokec19  \cf17 \strokec17 void\cf19 \strokec19  \cf21 \strokec21 OnConfiguring\cf19 \strokec19  (\cf17 \strokec17 DbContextOptionsBuilder\cf19 \strokec19  optionsBuilder) \{\cb1 \
+\cb18             \cf20 \strokec20 optionsBuilder\cf19 \strokec19 .\cf21 \strokec21 UseSqlite\cf19 \strokec19  (\cf25 \strokec25 "Data Source=Movie.db"\cf19 \strokec19 );\cb1 \
+\cb18             \cf26 \strokec26 //activate logging for compiled queries \cf19 \cb1 \strokec19 \
+\cb18             \cf17 \strokec17 var\cf19 \strokec19  lf \cf12 \strokec12 =\cf19 \strokec19  \cf17 \strokec17 new\cf19 \strokec19  \cf17 \strokec17 LoggerFactory\cf19 \strokec19 ();\cb1 \
+\cb18             \cf20 \strokec20 lf\cf19 \strokec19 .\cf21 \strokec21 AddProvider\cf19 \strokec19 (\cf17 \strokec17 new\cf19 \strokec19  \cf17 \strokec17 MyLoggerProvider\cf19 \strokec19 ());\cb1 \
+\cb18             \cf20 \strokec20 optionsBuilder\cf19 \strokec19 .\cf21 \strokec21 UseLoggerFactory\cf19 \strokec19 (\cf20 \strokec20 lf\cf19 \strokec19 );\cb1 \
+\cb18         \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf4 \outl0\strokewidth0 \
+\
+ \
+\
+\
+\
+}
