@@ -92,6 +92,8 @@ module TypeAlgebra {
 
   export let compose = GenericFunctions.pipeline
 
+  export let mk_pair = GenericTypes.mk_pair
+
   export let first : <A,B>(_:Times<A,B>) => A
                    = x => x.fst
   export let second : <A,B>(_:Times<A,B>) => B
@@ -114,14 +116,18 @@ module TypeAlgebra {
     return plus<Plus<C,D>, A, B>(compose<A, C, Plus<C,D>>(f)(inl), compose<B, D, Plus<C,D>>(g)(inr))
   }
 
-  // export let distribute_plus_times = function<A,B,C>(p:Times<A,Plus<B,C>>) : Plus<Times<A,B>,Times<A,C>> {
-  //   let x = first(p)
-  //   let y = second(p)
-  //   return plus_map<B,C,Times<A,B>,Times<A,C>>()(y)
-  // }
+  export let distribute_plus_times = function<A,B,C>(p:Times<A,Plus<B,C>>) : Plus<Times<A,B>,Times<A,C>> {
+    let a = first(p)
+    let bc = second(p)
+    return plus_map<B,C,Times<A,B>,Times<A,C>>(b => mk_pair<A,B>(a,b), c => mk_pair(a,c))(bc)
+  }
 
-  // distribute_plus_times
-  // group_plus_times
+  export let group_plus_times = function<A,B,C>(p:Plus<Times<A,B>,Times<A,C>>) : Times<A,Plus<B,C>> {
+    return plus<Times<A,Plus<B,C>>, Times<A,B>,Times<A,C>>(
+      ab => mk_pair<A,Plus<B,C>>(first(ab),inl(second(ab))),
+      ac => mk_pair<A,Plus<B,C>>(first(ac),inr(second(ac))))(p)
+  }
+
   // distribute_exp_plus
   // group_exp_plus
 }
