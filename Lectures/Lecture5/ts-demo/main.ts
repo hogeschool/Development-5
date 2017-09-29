@@ -1,8 +1,8 @@
 module Basics {
   let x1: number = 100
-  let x2: number | string = 100
-  let x3: number | string = "100"
-  let x4: number | "nothing" = "nothing"
+  let x2: boolean = true
+  let x3: string = "a string"
+  let x4: "A" = "A"
 
   export let main = () => console.log(x1, x2, x3, x4)
 }
@@ -18,12 +18,39 @@ module SimpleTypes {
 }
 
 module Unions {
+  let x1: number | "loading" | "error" = "loading"
+  let x2: number | string = "a string"
+  let x3: number | string = 101
+
   export type Person = SimpleTypes.Student | SimpleTypes.Teacher
   export let pietje: Person = SimpleTypes.pietje
   export let jannetje: Person = SimpleTypes.jannetje
   export let jannetje_2: Person = { name: "Jannetje", surname: "Ejtennaj", subject: "Programming 1" }
 
   export let main = () => console.log(JSON.stringify([pietje, jannetje]))
+}
+
+module DiscriminatedUnions {
+  export type Student = { kind: "student", name: string, surname: string, student_code: string }
+  export type Teacher = { kind: "teacher", name: string, surname: string, subject: string }
+  export type Person = Student | Teacher
+  export let pietje: Person = { ...SimpleTypes.pietje, kind: "student" }
+  // (WARNING: DOES NOT COMPILE!) export let pietje_2:Person = {...SimpleTypes.pietje, kind:"teacher" }
+  export let jannetje: Person = { ...SimpleTypes.jannetje, kind: "teacher" }
+  export let jannetje_2: Person = { name: "Jannetje", surname: "Ejtennaj", subject: "Programming 1", kind: "teacher" }
+
+  export let name: (_: Person) => string
+    = p => p.name
+
+  export function pretty_print(p: Person) : string {
+    if (p.kind == "student") {
+      return `${p.name} has a code of ${p.student_code}`
+    } else {
+      return `${p.name} teaches ${p.subject}`
+    }
+  }
+
+  export let main = () => console.log(pretty_print(pietje), pretty_print(jannetje), pretty_print(jannetje_2))
 }
 
 module DiscriminatedUnionsAndIntersections {
