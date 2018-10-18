@@ -1,0 +1,886 @@
+MVC design pattern: https://msdn.microsoft.com/en-us/library/dd381412(v=vs.108).aspx
+REST design: https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design
+REST implementation: https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-implementation 
+
+Exam info: The theory check consists of 10 of multiple choice questions. Each multiple choice question gives one point if correctly answered. You need to score at least 5,5 to pass the theory check. 
+
+File info: In the following you find all possible multiple choice questions. The * denotes the correct answer for a question.
+----------------------------
+q1: Is the MVC design pattern suitable for both desktop and web applications? 
+-No
+-Yes, as long as the View an the Controller are written in C#
+-Yes *
+-Partially, as long as the model supports Postgres 
+----------------------------
+q2: What is a benefit of using MVC design pattern? 
+-Strong typing
+-Separation of concerns *
+-High performance
+-Simple user interface
+----------------------------
+q3: What is a benefit of using MVC design pattern? 
+-Strong typing
+-High performance
+-Managing complexity *
+-It simplifies the integration of external libraries  
+----------------------------
+q4: What is a benefit of using MVC design pattern? 
+-Strong typing
+-High performance
+-It simplifies the integration of external libraries  
+-It makes it easier to test each part of the application as a unit *
+----------------------------
+q5: Given a context class that defines a relationship between two entities Movie and Actor, what 
+is the result of executing the OnModelCreating-method:
+...
+ protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MovieActor>()
+                .HasKey(ma => new { ma.MovieId, ma.ActorId });
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(m => m.Movie)
+                .WithMany(r => r.MovieActors)
+                .HasForeignKey(m => m.MovieId);
+
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(a => a.Actor)
+                .WithMany(r => r.MovieActors)
+                .HasForeignKey(a => a.ActorId);
+        }
+...
+
+- A N-to-N relationship between the entities Movie and Actor. It will create three tables in the database. *
+- A One-to-N relationship. It will create two tables in the database.
+- A N-to-N relationship. It will create two tables in the database.
+- A One-to-N relationship. It will create three tables in the database.
+
+----------------------------
+q6: EF can resolve an One-to-N relationship just by following the provided classes' structure: 
+-Yes, if the foreign key is unique
+-Yes if you follow the conventions *
+-No
+-Yes, if the migration scripts are setup correctly
+----------------------------
+q7: An entity X is related to an entity Y through a foreign key (One-to-N). What happens to Y if X is deleted, when using LINQ in combination with Postgres? 
+-Error
+-Both X and Y are deleted *
+-Nothing changes
+-The foreign key is set to NULL in Y
+
+----------------------------
+q8: In the context of EF, given the following code using(var db = new MyContext()){...body...} what is the purpose of keyword using? 
+-To avoid the database to get erased
+-It starts the tracking of entities
+-Nothing, it is just a syntactic sugar
+-It de-allocates the instance of the database after the body is executed *
+----------------------------
+q9:What does the following code do?
+...
+ protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder.UseSqlite ("Data Source=Movie.db");
+        }
+ ...
+
+-It connects the current Context to a database called "Data Source=Movie.db"
+-It connects the current Context to an Sqlite database *
+-It gives a compilation error
+-It connects the current Context to a Postgres database
+----------------------------
+q10: What is the result of executing the following code in the method OnModelCreating?
+...
+modelBuilder.Entity<Actor> ()
+            .HasOne(m => m.Movie)
+            .WithMany (a => a.Actors)
+            .HasForeignKey (m => m.MovieId);
+...
+
+-An N-to-N relationship from Movie to Actor is established
+-A One-to-N relationship from Movie to Actor with MovieId as foreign key in Actor is created *
+-A One-to-One relationship from Movie to Actor is established
+-A One-to-N relationship from Movie to Actor with ActorId as foreign key in Movie is created
+----------------------------
+q11: In EF given a One-to-N relationship between Movies and Actors, what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+
+    foreach(var a in m.Actors){
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+
+-Prints for every movie its actors
+-Runtime error since Actors is always null *
+-Prints all the actors in the database
+-Runtime error since m is null
+----------------------------
+q12: In EF given a One-to-N relationship between Movies and Actors. Assuming the relationships are correctly implemented. what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+    foreach(var a in db.Actors.Where(a => a.id == m.actor_id )){    
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+
+-Prints for every movie its actors
+-Runtime error since Actors is always null 
+-Prints for every movie the title followed by its actors' name * 
+-Runtime error since m is null
+----------------------------
+
+q13: var ms = db.Movies.Select(m=>m) vs var ms = db.Movies.Select(m=>m).toList() what is the difference? 
+
+-In the first one we load all the movies from the database, in the second one we store only the query/intention to select all the movies
+-In the first one we store only the query/intention to select all the movies; in the second one we force EF to load all the movies from the db and to store them in ms *
+-Both produce the same result
+-The first one is not possible whereas the second one is possible
+----------------------------
+q14: Pagination is used to? 
+-Store data as pages in the database
+-Retrieve only those records from the database that must be displayed for the particular page of data requested by the user *
+-Protect users' identity
+-Retrieve all the records from the database but view them as pages
+----------------------------
+q15: In REST every resource(URI) must implement all the HTTP Methods such as GET, POST, PUT?
+-No, only if needed *
+-No, but you must always implement the same set of methods for every resource
+-Yes, all of them must be implemented
+-Yes, as long as GET is always present
+----------------------------
+q16: In a RESTful application all methods are: 
+-Static
+-Stateless *
+-Protected
+-Private
+----------------------------
+q17: In which part of the HTTP GET message are the parameter sent: 
+-Footer
+-Header *
+-Body
+-CSS
+----------------------------
+q18: In a RESTful application for which operation HTTP POST is used?
+-To create new entities *
+-To delete duplicate entities
+-To mark entities for deletion
+-To change the primary key of an entity
+----------------------------
+q19: In a RESTful application for which operation HTTP PUT is used? 
+-To create new entities
+-To update entities *
+-To mark entities for deletion
+-To create a new entity from an already existing one
+----------------------------
+q20: The code 404 is returned when? 
+-The parameters are missing
+-Requesting a non existing data *
+-The server is unreachable
+-The client is using an old version of javascript
+----------------------------
+q21: The code 500 is returned when? 
+-The parameters are missing
+-Requesting a non existing URI 
+-The server is unreachable
+-The server encountered an unexpected condition which prevented it from fulfilling the request *
+-The client is using an old version of javascript
+----------------------------
+q22: The code 400 is returned when? 
+-The parameters are missing
+-Requesting a non existing URI 
+-The server is unreachable
+-The client is using an old version of javascript
+-The request had bad syntax or was inherently impossible to be satisfied *
+----------------------------
+q23: The code 200 is returned when? 
+-The parameters are missing
+-Requesting a non existing URI 
+-The server is unreachable
+-The request was fulfilled *
+-The client is using an old version of javascript
+----------------------------
+q24: In a RESTful application each entity of the Model must be mapped to a unique resource identifier(URI): 
+-No *
+-yes
+-Depends, on the cardinality of the primary key
+-Yes, as long as all entities are correctly encapsulated
+----------------------------
+q25: In the following answers which item is a possible response for a RESTful application ? 
+-float and integer
+-Blob or HTML
+-string and XML
+-JSON or HTML *
+----------------------------
+q26: Given the following code in Typescript <let x: true | string = false;>  what happens if you execute this code? 
+-Compilation error *
+-Runtime error
+-Logic error
+-false is assigned to x
+----------------------------
+q27: Given the following code in Typescript <let x: true | string = true;> what happens if you execute this code?
+-Compilation error
+-Runtime error
+-Logic error
+-true is assigned to x *
+----------------------------
+q28: Given the following code in Typescript how many different types does the expression <type AB = A & B> produce?
+    type A = { x:"A1" | "A2" } 
+    type B = { y:"B1" | "B2" | "B3" }
+
+-5
+-4
+-3
+-6 *
+----------------------------
+q29: Who takes care of executing the code of a React components? 
+- The javascript engine running in the browser *
+- The template engine on the server
+- The CLR of the dotnet platform
+- The controller
+----------------------------
+q30: Does the following expression force the re-rendering the component <this.state.x = 1>? 
+- Yes
+- No, because X can not be a number
+- No *
+- Yes, as long as the component is running on an asynchronous thread
+----------------------------
+q31: Does the following expression force the re-rendering the component <this.setState({...this.state, x : 1})>? 
+- No, because X can not be a number
+- No 
+- Yes, as long as the component is running on an asynchronous thread
+- Yes *
+----------------------------
+q32: What is the difference between state and props in React? 
+- They are the same
+- Given a component X, state contains local data of X, whereas props contains data coming from whoever instantiated X * 
+- Both can be used to pass data to a component
+- State is immutable whereas props are not
+----------------------------
+q33: What does the render method of a React component return? 
+- Any type of objects
+- HTML objects * 
+- The page to render after one second
+- Nothing, since the rendering in react is done automatically
+----------------------------
+q34: Given the following code in Typescript how many different types does the expression <type AB = A | B> produce?
+    type A = { x:"A1" | "A2" } 
+    type B = { y:"B1" | "B2" | "B3" }
+-11 *
+-4
+-3
+-6 
+----------------------------
+Q35: var ms = db.Movies.Select(m=>m) vs var ms = db.Movies.Select(m=>m).toArray() what is the difference? 
+
+-In the first one we load all the movies from the database, in the second one we store only the query/intention to select all the movies
+-In the first one we store only the query/intention to select all the movies; in the second one we force EF to load all the movies from the db and to store them in ms *
+-Both produce the same result
+-The first one is not possible whereas the second one is possible
+ -----------------------
+q36: In which part of the HTTP POST message are the values sent by default: 
+-Footer
+-Header 
+-Body *
+-CSS
+----------------------------
+q37: In which part of the HTTP PUT message are the values sent by default: 
+-Footer
+-Header 
+-Body *
+-CSS
+----------------------------
+q38: In which part of the HTTP DELETE message are the parameters sent by default: 
+-Footer
+-Header *
+-Body 
+-CSS
+----------------------------
+q39: Which status code is returned when the requested HTTP source is not found? 
+-404 *
+-500 
+-200
+-400
+----------------------------
+q40: What is the standard response code for a successful HTTP request? 
+-200 *
+-201 
+-200
+-400
+----------------------------
+q41: Which status code is returned after an internal server error for a HTTP request? 
+-500 *
+-400
+-300
+-200
+---------------------------
+q42: Given the following code in Typescript <let x1: number | "loading" | "error" = "loading">  What happens if you execute this code? 
+-Compilation error
+-Runtime error
+-Logic error
+-"loading" is assigned to x1 *
+---------------------------
+q43: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen" }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen" will be assigned to t1. 
+---------------------------
+q44: Which statement of the following is true? 
+-React is a front-end framework * 
+-React re-renders the whole document object model(DOM) if any child element has been updated 
+-React props can be manipulated in a component 
+-React states are immutable
+---------------------------
+q45: Which statement of the following is true? 
+-React is a back-end framework  
+-React re-renders the whole document object model(DOM) if any child element has been updated 
+-React props are immutable *
+-React states are immutable
+---------------------------
+q46: Which statement of the following is true? 
+-React is a back-end framework  
+-React renders by adding and removing elements to the DOM (via the virtual DOM)*
+-React props are mutable 
+-React states are immutable
+----------------------------
+q47: Given the following code in Typescript <let x: true | string = true and true;>  what happens if you execute this code? 
+-true is assigned to x *
+-Runtime error
+-Logic error
+-false is assigned to x
+----------------------------
+q48: Given the following code in Typescript <let x: true | "true" = "true";> what happens if you execute this code?
+-Compilation error
+-Runtime error
+-"true" is assigned to x *
+-true is assigned to x
+----------------------------
+q49: Given the following code in Typescript <let x: true | "true" = false;> what happens if you execute this code?
+-Compilation error *
+-Runtime error
+-"true" is assigned to x
+-true is assigned to x
+----------------------------
+q50: Given the following code in Typescript <let x: number | 1 = 1;> what happens if you execute this code?
+-Compilation error
+-Runtime error
+-1 is assigned to x *
+- -1 is assigned to x 
+----------------------------
+q51: Given the following code in Typescript how many different types does the definition <type AB = A & B> produce?
+    type A = { x:"A1" | "A2" } 
+    type B = { y:"B1" | "B2" }
+
+-5
+-4 *
+-3
+-6 
+----------------------------
+q52: Given the following code in Typescript how many different types does the definition <type AB = A & B> produce?
+    type A = { x:"A1" | "A2" } 
+    type B = { y:"B1" }
+
+-5
+-4
+-2 *
+-6
+----------------------------
+q53: Given the following code in Typescript how many different types does the expression <type AB = A | B> produce?
+    type A = { x:"A1" | "A2" } 
+    type B = { y:"B1" }
+
+-5 *
+-4 
+-3 
+-6
+----------------------------
+q54: Given the following code in Typescript how many different types does the expression <type AB = A & B> produce?
+    type A = { x:"A1" } 
+    type B = { y:"B1" }
+
+-4
+-2 
+-3
+-1 *
+---------------------------
+Q55: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math" }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen" will be assigned to t1. 
+---------------------------
+q56: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math", age: 29 }
+...
+-Compilation error
+-Runtime error
+-Logic error
+-The values "teacher", "Tim" and "Jansen", "math", and 29 will be assigned to t1 *
+---------------------------
+q57: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math", age: "29" }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+---------------------------
+q58: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen", subject: math, age: 29 }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+---------------------------
+q59: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+let math = "math"
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "student", name: "Tim", surname: "Jansen", subject: "math", age: 29 }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "student", "Tim" and "Jansen", "math", and 29 will be assigned to t1 
+---------------------------
+q60: Which statement of the following is true? 
+-The render method in react must always return a HTML item * 
+-React re-renders the whole document object model(DOM) if any child element has been updated 
+-React props can be updated 
+-In a react component you cannot define methods
+---------------------------
+q61: Which statement of the following is true? 
+-In a react component you can define methods *
+-React re-renders the whole document object model(DOM) if any child element has been updated 
+-React props are mutable
+-A component in react takes only one generic type argument
+---------------------------
+q62: Which statement of the following is true? 
+-A component in react takes 2 generic type arguments *
+-You cannot use promises in a react component
+-React props are not always immutable
+-React is a C# framework
+----------------------------
+q63: In EF given a N-to-N relationship between Movies and Actors, what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+
+    foreach(var a in m.Actors){
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+-Prints for every movie its actors
+-Runtime error since Actors is always null *
+-Prints all the actors in the database
+-Runtime error since m is null
+----------------------------
+q64: In EF given a N-to-N relationship between Movies and Actors. Assuming the relationships are correctly implemented. what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+    foreach(var a in db.Actors.Where(a => a.id == m.actor_id )){    
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+-Prints for every movie its actors
+-Runtime error since Actors is always null 
+-Prints for every movie the title followed by its actors' name
+-Logic error * 
+----------------------------
+q65: var ms = db.Movies.Select(m=>m).toArray() vs var ms = db.Movies.Select(m=>m).toList() what is the difference? 
+
+-In the first one we load all the movies from the database, in the second one we store only the query/intention to select all the movies
+-In the first one we store only the query/intention to select all the movies; in the second one we force EF to load all the movies from the db and to store them in ms
+-Both produce the same items *
+-The first one is not possible whereas the second one is possible
+----------------------------
+q66: In EF given a N-to-N relationship between Movies and Actors, what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+
+    foreach(var a in m.Actors){
+      if(a.Id > 10)
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+-Prints for every movie its actors
+-Runtime error since Actors is always null *
+-Prints all the actors in the database
+-Runtime error since m is null
+----------------------------
+q67: In EF given a 1-to-N relationship between Movies and Actors. Assuming the relationships are correctly implemented. what is the behaviour of the following code?
+...
+foreach(var m in db.Movies){
+    Console.WriteLine(m.Title);
+    foreach(var a in db.Actors.Where(a => a.id == m.actor_id && a.id > 10)){    
+       Console.WriteLine(a.Name); 
+    }
+}
+...
+-Prints for every movie all its actors with id greater than 10 *
+-Runtime error since Actors is always null 
+-Prints for every movie the title followed by its actors' name
+-Logic error
+---------------------------
+q69: In HTTP, Server errors start always with? 
+-5xx *
+-3xx 
+-4xx
+-2xx
+----------------------------
+q70: In HTTP, Client errors start always with? 
+-5xx 
+-3xx
+-4xx *
+-2xx
+----------------------------
+q71: In HTTP, success messages start always with? 
+-5xx
+-3xx 
+-4xx
+-2xx *
+----------------------------
+q72: In React, the componetWillMount method is called once before the first render?
+-True *
+-False
+-No, because componentWillMount is a function
+-Yes, as long the componetWillUnmount is present and overriden
+----------------------------
+q73: In React, How many time the componetWillMount method is called during the lifecycle of a component?
+-Once *
+-Twice
+-Before every render
+-After every render
+----------------------------
+q74: In React, How many time the componetDidMount method is called during the lifecycle of a component?
+-Once *
+-Twice
+-Before every renderre
+-After every render
+----------------------------
+q75: In React, the componetWillUnmount method is called once before the first render?
+-True
+-False *
+-componetWillUnmount is not part or React
+-Yes, as long the componetWillMount is present and overriden
+----------------------------
+q76: In React, the componetWillUnmount method is called once before the component gets disposed?
+-True *
+-False
+-componetWillUnmount is not part or React
+-Yes, as long the componetWillMount is present and overriden
+----------------------------
+q78: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       1 + x
+     </div>
+  }
+...
+
+-A div containing 1 + 1
+-A div containing 1 + x *
+-A div containing 2
+-An empty div
+----------------------------
+q79: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       {1 + x}
+     </div>
+  }
+...
+
+-A div containing 1 + 1
+-A div containing 1 + x
+-A div containing 2 *
+-An empty div
+----------------------------
+q80: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       1 + {x}
+     </div>
+  }
+...
+
+-A div containing 1 + 1 *
+-A div containing 1 + x
+-A div containing 2
+-An empty div
+----------------------------
+q81: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       1 {x} 1
+     </div>
+  }
+...
+
+-A div containing 1 + 1
+-Runtime error error
+-1 1 1 *
+-An empty div
+----------------------------
+q82: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       {1} + x
+     </div>
+  }
+...
+
+-A div containing 1 + 1
+-A div containing 1 + x *
+-A div containing 2
+-An empty div
+----------------------------
+q83 What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       {1 +} x
+     </div>
+  }
+...
+
+-A div containing 1 + 1
+-A div containing 1 + x
+-A compilation error *
+-A runtime error
+----------------------------
+q84: What does the following render of a React component return?
+...
+  render(){
+    let x = 1
+    return <div>
+       {5}
+     </div>
+  }
+...
+
+-A div containing 5 *
+-A div containing {5}
+-A compilation error
+-An empty div
+---------------------------
+q86: Given the following code in Typescript <let x: number | {value:number} = 1;> what happens if you execute this code?
+-Compilation error
+-Runtime error
+-1 is assigned to x *
+-{value:1} is assigned to x 
+----------------------------
+q86: Given the following code in Typescript <let x: {kind:"B", number}| {kind:"A", number} = 1; if x execute this code?
+-Nothing, compilation error *
+-Runtime error
+-1 is assigned to x
+-{kind:"A", number} is assigned to x 
+----------------------------
+q87: Given the following code in Typescript how many different types does the expression <type AB = A | B> produce when:
+    type A = { x:"A1"} 
+    type B = { y:"B1" } 
+?
+
+-5
+-4
+-3 *
+-6
+----------------------------
+q88: Given the following code in Typescript how many different types does the expression <type AB = A & B & C> produce?
+    type A = { x:"A2" } 
+    type B = { y:"B1" }
+    type C = { y:"C1" }
+
+-0
+-3
+-2
+-1 *
+----------------------------
+q89: Given the following code in Typescript how many different types does the expression <type AB = A & B & {kind:"C",value:number}> produce?
+    type A = { x:"A1" } 
+    type B = { y:"B1" }
+
+-Not possible
+-5
+-1 *
+-4
+
+---------------------------
+q90: Given the following code in Typescript used in React
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Teacher = { kind: "teacher", name: "Tim", surname: "Jansen", subject: biology }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen" will be assigned to t1. 
+---------------------------
+q91: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student
+...
+What happens if you execute this code? 
+...
+let t1:Person = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math", age: 29 }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+---------------------------
+q92: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Person = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math", age: 29 }
+...
+-Compilation error 
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1 *
+---------------------------
+q93: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Student  = { kind: "teacher", name: "Tim", surname: "Jansen", subject: "math", age: 29 }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+---------------------------
+q94: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+let math = "math"
+...
+What happens if you execute this code? 
+...
+let t1:Person = { kind: "teacher", name: "Tim", surname: "Jansen", subject: math, age: "29" }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+---------------------------
+q95: Which statement of the following is true? 
+-The render method in react not necessary returns always a HTML item
+-React re-renders the whole document object model(DOM) if any child element has been updated 
+-React components are composable *
+-In a react component you cannot define methods
+---------------------------
+q96: Given the following code in Typescript 
+... 
+type Student = { kind: "student", name: string, surname: string, student_code: string }
+type Teacher = { kind: "teacher", name: string, surname: string, subject: string, age: number }
+type Person = Student | Teacher
+...
+What happens if you execute this code? 
+...
+let t1:Person = { kind: "teacher", name: "Tim", surname: "Jansen", subject: math, age: 29 }
+...
+-Compilation error *
+-Runtime error
+-Logic error
+-The values "teacher", "time" and "Jansen", "math", and 29 will be assigned to t1
+----------------------------
+q97: In the following answers which item is a possible response for a RESTful application ? 
+-float and integer
+-Blob or HTML
+-JSX and XML
+-JSON *
+----------------------------
+q98: How does razor distinguish between C# code and HTML? 
+-The #! token is used by the parser to distinguish C# from HTML
+-By means of a config file
+-The @ token is used by the parser to distinguish C# from HTML *
+-C# expressions are automatically recognised by the parser without any syntactic support
+----------------------------
+q99: What is a template engine?
+-An engine that combines data and template into HTML *
+-An engine for building C# code
+-An engine for interpreting javascript code
+-An engine that checks the quality of code
